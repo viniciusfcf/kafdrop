@@ -18,11 +18,14 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import kafdrop.model.AclVO;
-import kafdrop.service.KafkaMonitor;
+import java.util.List;
+
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,7 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import kafdrop.model.AclVO;
+import kafdrop.service.KafkaMonitor;
 
 @Controller
 public final class AclController {
@@ -48,9 +52,9 @@ public final class AclController {
     return "acl-overview";
   }
 
-  @ApiOperation(value = "getAllAcls", notes = "Get list of all acls")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
+  @Operation(summary = "getAllAcls", description = "Get list of all acls")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", content = @Content(schema = @Schema(type = SchemaType.ARRAY, implementation = AclVO.class)))
   })
   @RequestMapping(path = "/acl", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<AclVO> getAllTopics() {

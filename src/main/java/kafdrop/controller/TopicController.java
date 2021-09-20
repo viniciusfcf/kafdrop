@@ -18,18 +18,28 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import kafdrop.model.ConsumerVO;
+import kafdrop.model.CreateTopicVO;
+import kafdrop.model.TopicVO;
+import kafdrop.service.KafkaMonitor;
+import kafdrop.service.TopicNotFoundException;
 
 /**
  * Handles requests for the topic page.
@@ -37,7 +47,6 @@ import java.util.*;
 @Controller
 @RequestMapping("/topic")
 public final class TopicController {
-  private static final Logger LOG = LoggerFactory.getLogger(TopicController.class);
   private final KafkaMonitor kafkaMonitor;
   private final boolean topicDeleteEnabled;
   private final boolean topicCreateEnabled;
@@ -88,10 +97,10 @@ public final class TopicController {
     return "topic-create";
   }
 
-  @ApiOperation(value = "getTopic", notes = "Get details for a topic")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = TopicVO.class),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+  @Operation(summary = "getTopic", description = "Get details for a topic")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", response = TopicVO.class),
+      @APIResponse(responseCode = "404")
   })
   @RequestMapping(path = "/{name:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody TopicVO getTopic(@PathVariable("name") String topicName) {
@@ -99,19 +108,19 @@ public final class TopicController {
         .orElseThrow(() -> new TopicNotFoundException(topicName));
   }
 
-  @ApiOperation(value = "getAllTopics", notes = "Get list of all topics")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List")
+  @Operation(summary = "getAllTopics", description = "Get list of all topics")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", response = String.class, responseContainer = "List")
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<TopicVO> getAllTopics() {
     return kafkaMonitor.getTopics();
   }
 
-  @ApiOperation(value = "getConsumers", notes = "Get consumers for a topic")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class, responseContainer = "List"),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+  @Operation(summary = "getConsumers", description = "Get consumers for a topic")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", response = String.class, responseContainer = "List"),
+      @APIResponse(responseCode = "404")
   })
   @RequestMapping(path = "/{name:.+}/consumers", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<ConsumerVO> getConsumers(@PathVariable("name") String topicName) {
@@ -124,9 +133,9 @@ public final class TopicController {
    * API for topic creation
    * @param createTopicVO request
    */
-  @ApiOperation(value = "createTopic", notes = "Create topic")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = String.class)
+  @Operation(summary = "createTopic", description = "Create topic")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", response = String.class)
   })
   @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
   public String createTopic(CreateTopicVO createTopicVO, Model model) {

@@ -18,13 +18,21 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kafdrop.model.ConsumerVO;
+import kafdrop.service.KafkaMonitor;
 
 @Controller
 @RequestMapping("/consumer")
@@ -46,10 +54,10 @@ public final class ConsumerController {
     return "consumer-detail";
   }
 
-  @ApiOperation(value = "getConsumer", notes = "Get topic and partition details for a consumer group")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = ConsumerVO.class),
-      @ApiResponse(code = 404, message = "Invalid consumer group")
+  @Operation(summary = "getConsumer", description = "Get topic and partition details for a consumer group")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ConsumerVO.class))),
+      @APIResponse(responseCode = "404")
   })
   @RequestMapping(path = "/{groupId:.+}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody ConsumerVO getConsumer(@PathVariable("groupId") String groupId) throws ConsumerNotFoundException {
@@ -60,4 +68,5 @@ public final class ConsumerController {
         .findAny();
     return consumer.orElseThrow(() -> new ConsumerNotFoundException(groupId));
   }
+  
 }

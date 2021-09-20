@@ -28,25 +28,22 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import kafdrop.util.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import kafdrop.config.MessageFormatConfiguration.MessageFormatProperties;
 import kafdrop.config.ProtobufDescriptorConfiguration.ProtobufDescriptorProperties;
 import kafdrop.config.SchemaRegistryConfiguration.SchemaRegistryProperties;
@@ -56,6 +53,15 @@ import kafdrop.model.TopicVO;
 import kafdrop.service.KafkaMonitor;
 import kafdrop.service.MessageInspector;
 import kafdrop.service.TopicNotFoundException;
+import kafdrop.util.AvroMessageDeserializer;
+import kafdrop.util.DefaultMessageDeserializer;
+import kafdrop.util.Deserializers;
+import kafdrop.util.KeyFormat;
+import kafdrop.util.MessageDeserializer;
+import kafdrop.util.MessageFormat;
+import kafdrop.util.MsgPackMessageDeserializer;
+import kafdrop.util.ProtobufMessageDeserializer;
+import kafdrop.util.ProtobufSchemaRegistryMessageDeserializer;
 
 @Controller
 public final class MessageController {
@@ -205,10 +211,10 @@ public final class MessageController {
    * @param topicName Name of topic.
    * @return Offset or message data.
    */
-  @ApiOperation(value = "getPartitionOrMessages", notes = "Get offset or message data for a topic. Without query params returns all partitions with offset data. With query params, returns actual messages (if valid offsets are provided).")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = List.class),
-      @ApiResponse(code = 404, message = "Invalid topic name")
+  @Operation(summary = "getPartitionOrMessages", description = "Get offset or message data for a topic. Without query params returns all partitions with offset data. With query params, returns actual messages (if valid offsets are provided).")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", response = List.class),
+      @APIResponse(responseCode = "404")
   })
   @RequestMapping(method = RequestMethod.GET, value = "/topic/{name:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
   public @ResponseBody

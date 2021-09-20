@@ -1,20 +1,49 @@
 package kafdrop.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiParam;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-@Data
-@RequiredArgsConstructor
-@ApiModel("Create topic model")
+// @ApiModel("Create topic model")
+@Schema(name = "Create topic model")
 public final class CreateTopicVO {
-  @ApiParam("Topic name")
+  
+  @Schema(name = "Topic name")
   String name;
 
-  @ApiParam("Number of partitions")
+  @Schema(name = "Number of partitions")
   int partitionsNumber;
 
-  @ApiParam("Replication factor")
+  @Schema(name = "Replication factor")
   int replicationFactor;
+
+  public CreateTopicVO(String name, int partitionsNumber, int replicationFactor) {
+    this.name = name;
+    this.partitionsNumber = partitionsNumber;
+    this.replicationFactor = replicationFactor;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public int getPartitionsNumber() {
+    return partitionsNumber;
+  }
+
+  public void setPartitionsNumber(int partitionsNumber) {
+    this.partitionsNumber = partitionsNumber;
+  }
+
+  public int getReplicationFactor() {
+    return replicationFactor;
+  }
+
+  public void setReplicationFactor(int replicationFactor) {
+    this.replicationFactor = replicationFactor;
+  }
+
+
 }

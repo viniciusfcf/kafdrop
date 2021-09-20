@@ -18,15 +18,24 @@
 
 package kafdrop.controller;
 
-import io.swagger.annotations.*;
-import kafdrop.model.*;
-import kafdrop.service.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.ui.*;
-import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-import java.util.*;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kafdrop.model.BrokerVO;
+import kafdrop.service.BrokerNotFoundException;
+import kafdrop.service.KafkaMonitor;
 
 @Controller
 public final class BrokerController {
@@ -44,19 +53,19 @@ public final class BrokerController {
     return "broker-detail";
   }
 
-  @ApiOperation(value = "getBroker", notes = "Get details for a specific Kafka broker")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = BrokerVO.class),
-      @ApiResponse(code = 404, message = "Invalid Broker ID")
+  @Operation(summary = "getBroker", description = "Get details for a specific Kafka broker")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = BrokerVO.class))),
+      @APIResponse(responseCode = "404")
   })
   @RequestMapping(path = "/broker/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody BrokerVO brokerDetailsJson(@PathVariable("id") int brokerId) {
     return kafkaMonitor.getBroker(brokerId).orElseThrow(() -> new BrokerNotFoundException("No such broker " + brokerId));
   }
 
-  @ApiOperation(value = "getAllBrokers", notes = "Get details for all known Kafka brokers")
-  @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Success", response = BrokerVO.class)
+  @Operation(summary = "getAllBrokers", description = "Get details for all known Kafka brokers")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = BrokerVO.class)))
   })
   @RequestMapping(path = "/broker", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
   public @ResponseBody List<BrokerVO> brokerDetailsJson() {

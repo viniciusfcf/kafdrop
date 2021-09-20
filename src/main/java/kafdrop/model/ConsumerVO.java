@@ -18,16 +18,16 @@
 
 package kafdrop.model;
 
-import org.apache.commons.lang3.*;
 
 import java.util.*;
+
+import javax.validation.constraints.NotEmpty;
 
 public final class ConsumerVO implements Comparable<ConsumerVO> {
   private final String groupId;
   private final Map<String, ConsumerTopicVO> topics = new TreeMap<>();
 
-  public ConsumerVO(String groupId) {
-    Validate.notEmpty("groupId is required");
+  public ConsumerVO(@NotEmpty(message = "groupId is required") String groupId) {
     this.groupId = groupId;
   }
 
